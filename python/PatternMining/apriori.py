@@ -1,45 +1,46 @@
+def setExists(itemCounts, candidateSet):
+    for setCountPair in itemCounts:
+        if setCountPair[0] == candidateSet:
+            return True
 
+    return False
 
-def include(itemSet, candidateSet):
-    print itemSet
-    print candidateSet
-    for item in candidateSet:
-        if item not in itemSet:
-            return False
+def incrementCount(itemCounts, candidateSet):
+    for setCountPair in itemCounts:
+        if setCountPair[0] == candidateSet:
+            setCountPair[1] += 1
 
-    return True
+def countItems(itemSets, candidateSets = set([])):
+    itemCounts = [] # List of pairs of [set, count]
 
-def countItems(itemSets, candidateSets = []):
-    itemCounts = {}
-
-    if candidateSets == []:
+    if len(candidateSets) == 0:
         for itemSet in itemSets:
             for item in itemSet:
-                candidateSet = (item,)   # Use tuple as key of dict, because list is not hashable
-                if itemCounts.has_key(candidateSet):
-                    itemCounts[candidateSet] += 1
+                candidateSet = set(item)   # Use tuple as key of dict, because list is not hashable
+                if setExists(itemCounts, candidateSet):
+                    incrementCount(itemCounts, candidateSet)
                 else:
-                    itemCounts[candidateSet] = 1
+                    itemCounts.append([candidateSet, 1])
     else:
         for candidateSet in candidateSets:
-            itemCounts[candidateSet] = 0
+            itemCounts.append([candidateSet, 0])
 
         for candidateSet in candidateSets:
             for itemSet in itemSets:
-                if include(itemSet, candidateSet):
-                    itemCounts[candidateSet] += 1
+                if itemSet >= candidateSet: # itemSet includes candidateSet
+                    incrementCount(itemCounts, candidateSet)
 
     return itemCounts
 
 def generateCandidateSets(itemCounts, minsup):
-    candidateSets = {}
-    for k,v in itemCounts.items():
-        if v >= minsup:
-            candidateSets[k] = v   #candidateSet is a list of items
+    candidateSets = []
+    for itemCount in itemCounts:
+        if itemCount[1] >= minsup:
+            candidateSets.append(itemCount)   #candidateSet is a list of item-count pair
 
     return candidateSets
 
-def generateNewItemSets(itemSets, singleCandidate, minsup, candidateSets):
+def generateNewItemSets(itemSets, singleCandidates, minsup, candidateSets):
     itemCounts = countItems(itemSets, candidateSets)
     print itemCounts
 
@@ -47,11 +48,11 @@ def generateNewItemSets(itemSets, singleCandidate, minsup, candidateSets):
     print candidateSets
 
     newItemSets = []
-    for candidate,count in newCandidates.items():
-        for singleItem,singleCount in singleCandidate.items():
-            if not include(candidate, singleItem):
+    for candidate in newCandidates:
+        for singleItem in singleCandidates:
+            if not (candidate[0] >= singleItem[0]):
                 #Avoid duplicate join
-                combination = (candidate + singleItem).sort()
+                combination = candidate[0] | singleItem[0]
                 if combination not in newItemSets:
                     newItemSets.append(combination)
 
@@ -60,5 +61,9 @@ def generateNewItemSets(itemSets, singleCandidate, minsup, candidateSets):
 data = [('A', 'C', 'D'), ('B', 'C', 'E'), ('A', 'B', 'C', 'E'), ('B', 'E')]
 minsup = 2
 
+itemSets = []
+for item in data:
+    itemSets.append(set(item))
+
 singleItems = generateCandidateSets(countItems(data), minsup)
-generateNewItemSets(data, singleItems, minsup, [])
+generateNewItemSets(itemSets, singleItems, minsup, [])
