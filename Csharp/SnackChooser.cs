@@ -61,7 +61,7 @@ namespace SnackOfTheDay
 
             foreach (string snack in snacks)
             {
-                Console.WriteLine("{0} selected {1}%", snack, (double)snackCounts[snack] / loops);
+                Console.WriteLine("{0} selected {1}%", snack, (double)snackCounts[snack] * 100 / loops);
             }
         }
 
