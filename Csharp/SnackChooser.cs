@@ -68,9 +68,9 @@ namespace SnackOfTheDay
         static void Main(string[] args)
         {
             //SnackChooser.Test();
-            Console.WriteLine("Snack for today: {0}", SnackChooser.Choose());
+            Console.Write("Snack for today: {0}", SnackChooser.Choose());
 
-            Console.ReadLine();
+            Console.Read();
         }
     }
 }
